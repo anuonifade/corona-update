@@ -1,15 +1,15 @@
 import React from 'react';
 import Helmet from 'react-helmet';
-// import L from 'leaflet';
-import axios from 'axios';
+import L from 'leaflet';
 
+import { useTracker } from 'hooks';
 import Layout from 'components/Layout';
 import Container from 'components/Container';
 import Map from 'components/Map';
 
 const LOCATION = {
-  lat: 38.9072,
-  lng: -77.0369
+  lat: 0,
+  lng: 0
 };
 const CENTER = [LOCATION.lat, LOCATION.lng];
 const DEFAULT_ZOOM = 2;
@@ -25,22 +25,22 @@ const IndexPage = () => {
   async function mapEffect({ leafletElement: map } = {}) {
     let response;
 
-    try {
-      response = await axios.get(`${API_URL}/countries`);
-    } catch(e) {
-      console.log(`Failed to fetch countries: ${e.message}`, e);
-      return;
-    }
+    const { data: countries = [] } = useTracker({
+      api: countries
+    })
 
-    const {data = []} = response;
+    const { data: stats={} }  = useTracker({
+      api: 'all'
+    })
 
-    const hasData = Array.isArray(data) && data.length > 0
+    console.log('stats ', stats);
 
-    if (!hasData) return;
+    const hasCountries = Array.isArray(countries) &&  countries.length > 0;
+    if ( !hasCountries ) return;
 
-    const geoJSON = {
+    const geoJson = {
       type: 'FeatureCollection',
-      features: data.map((country = {}) => {
+      features: countries.map((country = {}) => {
         const { countryInfo  = {} } = country;
         const{ lat, long: lng }  = countryInfo;
 
@@ -57,7 +57,58 @@ const IndexPage = () => {
       })
     }
 
-    console.log(geoJSON);
+    const geoJsonLayers = new L.GeoJSON(geoJson, {
+      pointToLayer: (feature= {}, latlng) => {
+        const { properties = {} } = feature;
+        let updatedFormatted;
+        let casesString;
+
+        const {
+          country,
+          updated,
+          cases,
+          deaths,
+          recovered
+        } = properties
+
+        casesString = `${cases}`;
+
+        if (cases > 1000 && cases < 1000000) {
+          casesString = `${casesString.slice(0, -3)}k+`
+        } else if (cases > 1000000) {
+          casesString = `${casesString.slice(0, -6)}M+`
+        }
+
+        if (updated) {
+          updatedFormatted = new Date(updated).toLocaleString();
+        }
+
+        const html = `
+          <span class="icon-marker">
+            <span class="icon-marker-tooltip">
+              <h2>${country}</h2>
+              <ul>
+                <li><strong>Confirmed:</strong> ${cases}</li>
+                <li><strong>Deaths:</strong> ${deaths}</li>
+                <li><strong>Recovered:</strong> ${recovered}</li>
+                <li><strong>Last Update:</strong> ${updatedFormatted}</li>
+              </ul>
+            </span>
+            ${ casesString }
+          </span>
+        `
+
+        return L.marker(latlng, {
+          icon: L.divIcon({
+            className: 'icon',
+            html
+          }),
+          riseOnHover: true
+        });
+      }
+    });
+
+    geoJsonLayers.addTo(map);
   }
 
   const mapSettings = {
@@ -70,20 +121,12 @@ const IndexPage = () => {
   return (
     <Layout pageName="home">
       <Helmet>
-        <title>Home Page</title>
+        <title>Home</title>
       </Helmet>
-
-      <Map {...mapSettings}>
-      </Map>
-
-      <Container type="content" className="text-center home-start">
-        <h2>Still Getting Started?</h2>
-        <p>Run the following in your terminal!</p>
-        <pre>
-          <code>gatsby new [directory] https://github.com/colbyfayock/gatsby-starter-leaflet</code>
-        </pre>
-        <p className="note">Note: Gatsby CLI required globally for the above command</p>
-      </Container>
+      <div className="map-container">
+        <Map {...mapSettings}>
+        </Map>
+      </div>
     </Layout>
   );
 };
