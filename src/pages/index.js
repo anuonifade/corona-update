@@ -135,7 +135,7 @@ const IndexPage = () => {
                 <li><strong>Last Update:</strong> ${updatedFormatted}</li>
               </ul>
             </span>
-            ${ casesString }
+            <span class="icon-text">${ casesString }</span>
           </span>
         `
 
@@ -166,7 +166,7 @@ const IndexPage = () => {
       </Helmet>
       <div className="tracker">
         <Map {...mapSettings} />
-        < div className = "tracker-stats">
+        <div className="tracker-stats">
           <ul>
             { dashboardStats.map(({ primary = {}, secondary = {} }, i) => {
               return(
