@@ -4,7 +4,7 @@ import L from 'leaflet';
 
 import { useTracker } from 'hooks';
 import Layout from 'components/Layout';
-import Container from 'components/Container';
+// import Container from 'components/Container';
 import Map from 'components/Map';
 
 const LOCATION = {
@@ -13,29 +13,23 @@ const LOCATION = {
 };
 const CENTER = [LOCATION.lat, LOCATION.lng];
 const DEFAULT_ZOOM = 2;
-const API_URL = 'https://corona.lmao.ninja/v2';
 
 const IndexPage = () => {
-  /**
-   * mapEffect
-   * @description Fires a callback once the page renders
-   * @example Here this is and example of being used to zoom in and set a popup on load
-   */
+
+  const { data: countries = [] } = useTracker({
+    api: 'countries'
+  })
+
+  const { data: stats = {} } = useTracker({
+    api: 'all'
+  })
+
+  console.log('stats ', stats);
+
+  const hasCountries = Array.isArray(countries) && countries.length > 0;
 
   async function mapEffect({ leafletElement: map } = {}) {
-    let response;
 
-    const { data: countries = [] } = useTracker({
-      api: countries
-    })
-
-    const { data: stats={} }  = useTracker({
-      api: 'all'
-    })
-
-    console.log('stats ', stats);
-
-    const hasCountries = Array.isArray(countries) &&  countries.length > 0;
     if ( !hasCountries ) return;
 
     const geoJson = {

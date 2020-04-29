@@ -17,14 +17,14 @@ const ENDPOINTS = [
 
 const defaultState = {
   data: null,
-  state: ready
+  state: 'ready'
 }
 
 const useTracker = ({ api = 'all' }) => {
   const [tracker = {}, updateTracker] = useState(defaultState)
 
   async function fetchTracker() {
-    let route = ENPOINTS.find(({ id } = {}) => id === api);
+    let route = ENDPOINTS.find(({ id } = {}) => id === api);
 
     if ( !route ) {
       route = ENDPOINTS.find(({ isDefault } = {} ) => !!isDefault);
@@ -39,6 +39,7 @@ const useTracker = ({ api = 'all' }) => {
           state: 'loading'
         }
       });
+      response = await axios.get(`${API_HOST}${route.path}`);
     } catch(e) {
       updateTracker((prev) => {
         return {
