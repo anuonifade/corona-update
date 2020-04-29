@@ -4,18 +4,18 @@ import Helmet from 'react-helmet';
 import Layout from 'components/Layout';
 import Container from 'components/Container';
 
-const SecondPage = () => {
+const BlogPage = () => {
   return (
     <Layout pageName="two">
       <Helmet>
-        <title>Page Two</title>
+        <title>Blogs and Articles</title>
       </Helmet>
       <Container type="content" className="text-center">
-        <h1>Page Two</h1>
-        <p>Welcome to page 2</p>
+        <h1>Blogs and Articles</h1>
+        <p>Welcome to Corona Virus Blogpost and Articles</p>
       </Container>
     </Layout>
   );
 };
 
-export default SecondPage;
+export default BlogPage;

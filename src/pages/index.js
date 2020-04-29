@@ -6,6 +6,7 @@ import { useTracker } from 'hooks';
 import Layout from 'components/Layout';
 // import Container from 'components/Container';
 import Map from 'components/Map';
+import { commafy, formattedDate } from 'lib/util';
 
 const LOCATION = {
   lat: 0,
@@ -27,6 +28,52 @@ const IndexPage = () => {
   console.log('stats ', stats);
 
   const hasCountries = Array.isArray(countries) && countries.length > 0;
+
+  const dashboardStats = [
+    {
+      primary: {
+        label: 'Total Cases',
+        value: stats? commafy(stats?.cases) : '-'
+      },
+      secondary: {
+        label: 'Per 1 Million',
+        value: stats? commafy(stats?.casesPerOneMillion) : '-'
+      }
+    }, {
+      primary: {
+        label: 'Total Deaths',
+        value: stats? commafy(stats?.deaths) : '-'
+      },
+      secondary: {
+        label: 'Per 1 Million',
+        value: stats? commafy(stats?.deathsPerOneMillion) : '-'
+      }
+    }, {
+      primary: {
+        label: 'Total Tests',
+        value: stats? commafy(stats?.tests) : '-'
+      },
+      secondary: {
+        label: 'Per 1 Million',
+        value: stats? commafy(stats?.testsPerOneMillion) : '-'
+      }
+    }, {
+      primary: {
+        label: 'Active Cases',
+        value: stats? commafy(stats?.active) : '-'
+      }
+    }, {
+      primary: {
+        label: 'Critical Cases',
+        value: stats ? commafy(stats?.critical) : '-'
+      }
+    }, {
+      primary: {
+        label: 'Recovered Cases',
+        value: stats ? commafy(stats?.recovered) : '-'
+      }
+    }
+  ];
 
   async function mapEffect({ leafletElement: map } = {}) {
 
@@ -69,7 +116,7 @@ const IndexPage = () => {
 
         if (cases > 1000 && cases < 1000000) {
           casesString = `${casesString.slice(0, -3)}k+`
-        } else if (cases > 1000000) {
+        } else if (cases > 999999) {
           casesString = `${casesString.slice(0, -6)}M+`
         }
 
@@ -117,9 +164,35 @@ const IndexPage = () => {
       <Helmet>
         <title>Home</title>
       </Helmet>
-      <div className="map-container">
-        <Map {...mapSettings}>
-        </Map>
+      <div className="tracker">
+        <Map {...mapSettings} />
+        < div className = "tracker-stats">
+          <ul>
+            { dashboardStats.map(({ primary = {}, secondary = {} }, i) => {
+              return(
+                <li key={ `Stat-${i}`} className="tracker-stat">
+                  { primary.value && (
+                      <p className="tracker-stat-primary">
+                        { primary.value }
+                        <strong>{ primary.label }</strong>
+                      </p>
+                  )}
+                  { secondary.value && (
+                    <p className="tracker-stat-secondary">
+                      { secondary.value }
+                      <strong>{ secondary.label }</strong>
+                    </p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className="tracker-last-updated">
+          <p>
+            Last Updated: { stats ? formattedDate(stats?.updated) : '-'} 
+          </p> 
+        </div>
       </div>
     </Layout>
   );
