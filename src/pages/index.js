@@ -13,7 +13,7 @@ const LOCATION = {
   lng: 0
 };
 const CENTER = [LOCATION.lat, LOCATION.lng];
-const DEFAULT_ZOOM = 2;
+const DEFAULT_ZOOM = 4;
 
 const IndexPage = () => {
 
