@@ -10,7 +10,7 @@ const Header = () => {
         <p><Link to="/">Corona Virus Update</Link></p>
         <ul>
           <li>
-            <Link to="/blogs/">Blog</Link>
+            <Link to="/articles/">Articles</Link>
           </li>
           <li>
             <Link to="/news/">News and Update</Link>
